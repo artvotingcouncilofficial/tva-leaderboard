@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    function isAdmin() { return signedIn() && userDoc().data.role == "ADMIN"; }
+    function isViewerOrAdmin() {
+      return signedIn() && userDoc().data.role in ["ADMIN", "VIEWER"];
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      // A user may create only their own VIEWER profile. ADMIN role must be assigned
+      // manually by a trusted project owner in Firebase Console.
+      allow create: if signedIn() && request.auth.uid == uid
+                    && request.resource.data.role == "VIEWER";
+      allow update, delete: if isAdmin();
+    }
+
+    match /players/{playerId} {
+      allow read: if isViewerOrAdmin();
+      allow create, update: if isAdmin();
+      allow delete: if false; // Deactivate players to preserve history.
+    }
+
+    match /matchEntries/{entryId} {
+      allow read: if isViewerOrAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.matchesPlayed is int
+        && request.resource.data.votes is int
+        && request.resource.data.wins is int
+        && request.resource.data.draws is int
+        && request.resource.data.losses is int
+        && request.resource.data.score is int
+        && request.resource.data.matchesPlayed >= 0
+        && request.resource.data.votes >= 0
+        && request.resource.data.wins >= 0
+        && request.resource.data.draws >= 0
+        && request.resource.data.losses >= 0
+        && request.resource.data.score >= 0
+        && request.resource.data.matchesPlayed ==
+           request.resource.data.wins + request.resource.data.draws + request.resource.data.losses;
+      allow delete: if isAdmin();
+    }
+
+    match /reports/{reportId} {
+      allow read: if isViewerOrAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+  }
+}
