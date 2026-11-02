@@ -1,10 +1,10 @@
 // Copy your Web app configuration from Firebase Console > Project settings > Your apps.
 // These values identify your Firebase project. Never put service-account private keys here.
 export const firebaseConfig = {
-  apiKey: "PASTE_API_KEY",
-  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
-  projectId: "PASTE_PROJECT_ID",
-  storageBucket: "PASTE_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "PASTE_MESSAGING_SENDER_ID",
-  appId: "PASTE_APP_ID"
+  apiKey: "AIzaSyCPgVit4HVLczHdK48vdPGzHl1CqbeaziY",
+  authDomain: "tva-player-management.firebaseapp.com",
+  projectId: "tva-player-management",
+  storageBucket: "tva-player-management.firebasestorage.app",
+  messagingSenderId: "760992172879",
+  appId: "1:760992172879:web:b3604960e859edbbf2133a"
 };
